@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - Example Studios</title>
+    <link rel="icon" type="image/svg+xml" href="blob:https://otst-deepstudio.hf.space/991e2462-9cb4-4c41-b0df-f5c69cc8190f">
+    <link rel="stylesheet" href="/styles/main.css">
+<script>
+// VFS Asset Interceptor - Auto-injected by DeepStudio
+(function() {
+  const vfsBlobUrls = {"/scripts/main.js":"blob:https://otst-deepstudio.hf.space/7f0d509e-491c-40db-95a3-c517e02de6e9","/scripts/contact.js":"blob:https://otst-deepstudio.hf.space/a4f12189-f42b-4c88-a32d-b8fbd0af1372","/assets/images/favicon.svg":"blob:https://otst-deepstudio.hf.space/991e2462-9cb4-4c41-b0df-f5c69cc8190f","/assets/images/logo.svg":"blob:https://otst-deepstudio.hf.space/1db94fc2-45e1-4f60-aded-3dad9478551b","/assets/README.md":"blob:https://otst-deepstudio.hf.space/74b1fba9-e6f7-4452-9e21-c967d459e20f","/assets/images/example-background.jpg":"blob:https://otst-deepstudio.hf.space/a3da27a5-c361-4af9-b36d-de6d0a2aca4b","/scripts/portfolio.js":"blob:https://otst-deepstudio.hf.space/7da1ef9e-2c50-41a6-8f58-4f4ca2d15428","/data.json":"blob:https://otst-deepstudio.hf.space/ad2a6d6a-5563-4b33-9f4d-38bd355b17b9","/portfolio/techflow-dashboard.html":"blob:https://otst-deepstudio.hf.space/023885d0-f8c1-45b1-afe3-d3297317d0d6","/terms.html":"blob:https://otst-deepstudio.hf.space/b58b91ce-4287-4ce0-ad06-ffa9405b0189","/portfolio.html":"blob:https://otst-deepstudio.hf.space/542cab3a-56be-470b-9282-58b6d4cffcff","/contact.html":"blob:https://otst-deepstudio.hf.space/aec3da8d-7a34-48eb-8d79-4f97ede8b1cd","/about.html":"blob:https://otst-deepstudio.hf.space/aace7b87-b6f1-421a-a07b-ec4ba67e4ba2"};
+  
+  // Helper function to resolve VFS paths to blob URLs
+  function resolveVfsUrl(url) {
+    if (!url || typeof url !== 'string') return url;
+    if (url.startsWith('/assets/') && vfsBlobUrls[url]) {
+      return vfsBlobUrls[url];
+    }
+    return url;
+  }
+  
+  // Intercept Image src setter to handle ALL image loading
+  const originalSrcDescriptor = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src');
+  Object.defineProperty(HTMLImageElement.prototype, 'src', {
+    get: function() {
+      return originalSrcDescriptor.get.call(this);
+    },
+    set: function(value) {
+      const resolvedUrl = resolveVfsUrl(value);
+      return originalSrcDescriptor.set.call(this, resolvedUrl);
+    },
+    enumerable: true,
+    configurable: true
+  });
+  
+  // Intercept setAttribute for src attributes
+  const originalSetAttribute = Element.prototype.setAttribute;
+  Element.prototype.setAttribute = function(name, value) {
+    if ((name === 'src' || name === 'href') && this instanceof HTMLImageElement) {
+      value = resolveVfsUrl(value);
+    }
+    return originalSetAttribute.call(this, name, value);
+  };
+  
+  // Intercept innerHTML to catch template-generated images
+  const originalInnerHTMLDescriptor = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML');
+  Object.defineProperty(Element.prototype, 'innerHTML', {
+    get: function() {
+      return originalInnerHTMLDescriptor.get.call(this);
+    },
+    set: function(value) {
+      if (typeof value === 'string' && value.includes('/assets/')) {
+        // Replace asset URLs in the HTML string before setting
+        const srcRegex = new RegExp('src=["\']([^"\']*/assets/[^"\']*)["\']', 'g');
+        value = value.replace(srcRegex, function(match, url) {
+          const resolvedUrl = resolveVfsUrl(url);
+          if (resolvedUrl !== url) {
+            return match.replace(url, resolvedUrl);
+          }
+          return match;
+        });
+      }
+      return originalInnerHTMLDescriptor.set.call(this, value);
+    },
+    enumerable: true,
+    configurable: true
+  });
+  
+  // Intercept Image constructor
+  const OriginalImage = window.Image;
+  window.Image = function(...args) {
+    const img = new OriginalImage(...args);
+    // Override src setter for this instance too
+    const descriptor = Object.getOwnPropertyDescriptor(img, 'src') || 
+                      Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src');
+    if (descriptor) {
+      Object.defineProperty(img, 'src', {
+        get: descriptor.get,
+        set: function(value) {
+          const resolvedUrl = resolveVfsUrl(value);
+          return originalSrcDescriptor.set.call(this, resolvedUrl);
+        },
+        enumerable: true,
+        configurable: true
+      });
+    }
+    return img;
+  };
+  // Preserve original Image properties
+  Object.setPrototypeOf(window.Image, OriginalImage);
+  window.Image.prototype = OriginalImage.prototype;
+  
+  // Intercept createElement for img elements
+  const originalCreateElement = document.createElement;
+  document.createElement = function(tagName, options) {
+    const element = originalCreateElement.call(this, tagName, options);
+    if (tagName.toLowerCase() === 'img') {
+      const originalSrcDescriptor = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src');
+      Object.defineProperty(element, 'src', {
+        get: function() {
+          return originalSrcDescriptor.get.call(this);
+        },
+        set: function(value) {
+          const resolvedUrl = resolveVfsUrl(value);
+          return originalSrcDescriptor.set.call(this, resolvedUrl);
+        },
+        enumerable: true,
+        configurable: true
+      });
+    }
+    return element;
+  };
+  
+  // Intercept fetch requests to VFS assets
+  const originalFetch = window.fetch;
+  window.fetch = function(input, init) {
+    const url = typeof input === 'string' ? input : input.url;
+    const resolvedUrl = resolveVfsUrl(url);
+    
+    if (resolvedUrl !== url) {
+      return originalFetch(resolvedUrl, init);
+    }
+    
+    return originalFetch(input, init);
+  };
+  
+  // Intercept XMLHttpRequest for older code
+  const OriginalXHR = window.XMLHttpRequest;
+  window.XMLHttpRequest = function() {
+    const xhr = new OriginalXHR();
+    const originalOpen = xhr.open;
+    
+    xhr.open = function(method, url, ...args) {
+      const resolvedUrl = resolveVfsUrl(url);
+      return originalOpen.call(this, method, resolvedUrl, ...args);
+    };
+    
+    return xhr;
+  };
+  
+  // Process any existing images in the DOM when ready
+  function processExistingImages() {
+    const images = document.querySelectorAll('img[src*="/assets/"]');
+    images.forEach(img => {
+      const currentSrc = img.src;
+      const resolvedSrc = resolveVfsUrl(currentSrc);
+      if (resolvedSrc !== currentSrc) {
+        img.src = resolvedSrc;
+      }
+    });
+  }
+  
+  // Use MutationObserver to catch dynamically added images
+  function setupMutationObserver() {
+    if (typeof MutationObserver !== 'undefined') {
+      const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+          mutation.addedNodes.forEach(function(node) {
+            if (node.nodeType === 1) { // Element node
+              if (node.tagName === 'IMG' && node.src && node.src.includes('/assets/')) {
+                const resolvedSrc = resolveVfsUrl(node.src);
+                if (resolvedSrc !== node.src) {
+                  node.src = resolvedSrc;
+                }
+              }
+              // Also check children
+              const childImages = node.querySelectorAll && node.querySelectorAll('img[src*="/assets/"]');
+              if (childImages) {
+                childImages.forEach(img => {
+                  const resolvedSrc = resolveVfsUrl(img.src);
+                  if (resolvedSrc !== img.src) {
+                    img.src = resolvedSrc;
+                  }
+                });
+              }
+            }
+          });
+        });
+      });
+      
+      observer.observe(document.body || document.documentElement, {
+        childList: true,
+        subtree: true
+      });
+    }
+  }
+  
+  // Setup everything when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+      processExistingImages();
+      setupMutationObserver();
+    });
+  } else {
+    processExistingImages();
+    setupMutationObserver();
+  }
+})();
+</script>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="nav-brand">
+            <img src="blob:https://otst-deepstudio.hf.space/1db94fc2-45e1-4f60-aded-3dad9478551b" alt="Example Studios" class="nav-logo">
+            <span>Example Studios</span>
+        </a>
+        
+        <button class="nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+        </button>
+        
+        <ul class="nav-menu">
+            <li><a href="/" class="nav-link">Home</a></li>
+            <li><a href="/portfolio.html" class="nav-link">Portfolio</a></li>
+            <li><a href="/about.html" class="nav-link">About</a></li>
+            <li><a href="/contact.html" class="nav-link">Contact</a></li>
+        </ul>
+    </nav>
+    <main>
+        <section class="hero sub-page">
+            <div class="hero-content">
+                <h1>Privacy Policy</h1>
+                <p class="hero-subtitle">How we protect and handle your information</p>
+            </div>
+        </section>
+        
+        <div class="container">
+            <div class="content-section">
+                <p><strong>Last updated:</strong> December 2024</p>
+                
+                <h2>Overview</h2>
+                <p>At Example Studios, we take your privacy seriously. This Privacy Policy explains how we collect, use, and protect your personal information when you use our services.</p>
+                
+                <h2>Information We Collect</h2>
+                <p>We may collect the following types of information:</p>
+                <ul>
+                    <li><strong>Contact Information:</strong> Name, email address, phone number when you contact us</li>
+                    <li><strong>Project Information:</strong> Details about your project requirements and preferences</li>
+                    <li><strong>Usage Data:</strong> How you interact with our website for improving our services</li>
+                </ul>
+                
+                <h2>How We Use Your Information</h2>
+                <p>We use your information to:</p>
+                <ul>
+                    <li>Provide and improve our design and development services</li>
+                    <li>Communicate with you about your projects</li>
+                    <li>Send you updates about our services (with your consent)</li>
+                    <li>Analyze and improve our website and services</li>
+                </ul>
+                
+                <h2>Information Sharing</h2>
+                <p>We do not sell, trade, or otherwise transfer your personal information to third parties without your consent, except:</p>
+                <ul>
+                    <li>To trusted service providers who help us operate our business</li>
+                    <li>When required by law or to protect our rights</li>
+                    <li>With your explicit consent</li>
+                </ul>
+                
+                <h2>Data Security</h2>
+                <p>We implement appropriate security measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction.</p>
+                
+                <h2>Your Rights</h2>
+                <p>You have the right to:</p>
+                <ul>
+                    <li>Access and review your personal information</li>
+                    <li>Request corrections to your information</li>
+                    <li>Request deletion of your information</li>
+                    <li>Opt-out of marketing communications</li>
+                </ul>
+                
+                <h2>Contact Us</h2>
+                <p>If you have questions about this Privacy Policy, please contact us at:</p>
+                <p>
+                    <strong>Example Studios</strong><br>
+                    Email: hello@examplestudios.com<br>
+                    Phone: (555) 123-4567
+                </p>
+            </div>
+        </div>
+        
+        <section class="cta-section">
+            <div class="cta-content">
+                <h2>Ready to Build Something Amazing?</h2>
+                <p>Let's turn your ideas into reality. We'd love to hear about your project.</p>
+                <a href="/contact.html" class="btn btn-primary">Start Your Project</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="footer-logo">
+                    <img src="blob:https://otst-deepstudio.hf.space/1db94fc2-45e1-4f60-aded-3dad9478551b" alt="Example Studios" width="40" height="40">
+                    <span>Example Studios</span>
+                </div>
+                <p class="footer-tagline">Crafting digital experiences that inspire</p>
+                <div class="footer-social">
+                    <a href="#" aria-label="Twitter">𝕏</a>
+                    <a href="#" aria-label="LinkedIn">in</a>
+                    <a href="#" aria-label="Instagram">📷</a>
+                    <a href="#" aria-label="GitHub">⚡</a>
+                </div>
+            </div>
+            
+            <div class="footer-links-section">
+                <div class="footer-column">
+                    <h4>Explore</h4>
+                    <ul class="footer-links">
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/portfolio.html">Portfolio</a></li>
+                        <li><a href="/about.html">About</a></li>
+                        <li><a href="/contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h4>Services</h4>
+                    <ul class="footer-links">
+                        <li><a href="/portfolio.html">Web Design</a></li>
+                        <li><a href="/portfolio.html">Development</a></li>
+                        <li><a href="/portfolio.html">Mobile Apps</a></li>
+                        <li><a href="/portfolio.html">Consulting</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <a href="https://huggingface.co/spaces/otst/deepstudio" target="_blank" class="footer-hf-link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                </svg>
+                <span>DeepStudio</span>
+            </a>
+            <div class="footer-bottom-links">
+                <a href="/privacy.html">Privacy Policy</a>
+                <span class="separator">•</span>
+                <a href="/terms.html">Terms of Service</a>
+                
+            </div>
+        </div>
+    </footer>
+    <script src="blob:https://otst-deepstudio.hf.space/7f0d509e-491c-40db-95a3-c517e02de6e9"></script>
+</body>
+</html>
